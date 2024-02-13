@@ -26,6 +26,7 @@ public class AmazonPageTest {
         driver.manage().window().maximize();
         driver.manage().timeouts().implicitlyWait(10, TimeUnit.SECONDS);
         driver.get("https://www.amazon.in/");
+        System.out.println("");
     }
     @Test(priority = 0, description = "This Test validates the Amazon page is launched")
     void AmazonLaunch(){
