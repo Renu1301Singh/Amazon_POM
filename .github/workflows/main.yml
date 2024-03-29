@@ -24,5 +24,5 @@ jobs:
 
     - name: Run Selenium tests with Maven
       run: mvn clean test -Dtest=AmazonPageTest
-      working-directory: Amazon_POM/src/test/java/Amazon/Test/
+      working-directory: Amazon_POM/src/test/java/Amazon/Test
       
