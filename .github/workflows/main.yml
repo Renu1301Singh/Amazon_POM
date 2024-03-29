@@ -16,11 +16,12 @@ jobs:
     - name: Install Java
       uses: actions/setup-java@v2
       with:
-        java-version: '22'  # Choose the appropriate Java version
+        java-version: '22'  
 
     - name: Install Maven
       run: sudo apt-get install maven
 
     - name: Run Selenium tests with Maven
       run: mvn clean test -Dtest=Amazon_POM
+      working-directory: Amazon_POM
       
