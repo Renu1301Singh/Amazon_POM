@@ -23,6 +23,6 @@ jobs:
       run: sudo apt-get install maven
 
     - name: Run Selenium tests with Maven
-      run: mvn clean test -Dtest=Amazon_POM
-      working-directory: Amazon_POM
+      run: mvn clean test -Dtest=AmazonPageTest
+      working-directory: Amazon_POM/src/test/java/Amazon/Test/
       
