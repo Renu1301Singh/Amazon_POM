@@ -15,15 +15,18 @@ jobs:
       
     - name: Install Chrome
       run: |
-         wget https://chromedriver.storage.googleapis.com/LATEST_RELEASE/chromedriver_linux64.zip
+        # Use the Google Chrome Stable version for Ubuntu 20.04 (Focal Fossa)
+        wget https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb
+        sudo dpkg -i --force-overwrite ./google-chrome-stable_current_amd64.deb
 
-         unzip chromedriver_linux64.zip
-
-         sudo mv chromedriver /usr/bin/chromedriver  
-
-         sudo chown root:root /usr/bin/chromedriver
-
-         sudo chmod +x /usr/bin/chromedriver
+        # Install ChromeDriver
+        LATEST_CHROMEDRIVER_VERSION=$(curl -s https://chromedriver.storage.googleapis.com/LATEST_RELEASE)
+        curl -o chromedriver.zip https://chromedriver.storage.googleapis.com/$LATEST_CHROMEDRIVER_VERSION/chromedriver_linux64.zip
+        unzip chromedriver.zip
+        sudo mv chromedriver /usr/bin/chromedriver
+        sudo chown root:root /usr/bin/chromedriver
+        sudo chmod +x /usr/bin/chromedriver
+        echo "export PATH=$PATH:/usr/bin/chromedriver" >> $GITHUB_ENV
 
     - name: Install Java
       uses: actions/setup-java@v2
@@ -33,15 +36,6 @@ jobs:
 
     - name: Install Maven
       run: sudo apt-get install maven
-
-    - name: Set up Chrome WebDriver
-      run: |
-        LATEST_CHROMEDRIVER_VERSION=$(curl -s https://chromedriver.storage.googleapis.com/LATEST_RELEASE)
-        curl -o chromedriver.zip https://chromedriver.storage.googleapis.com/$LATEST_CHROMEDRIVER_VERSION/chromedriver_linux64.zip
-        unzip chromedriver.zip
-        sudo mv chromedriver /usr/local/bin/
-        sudo chmod +x /usr/local/bin/chromedriver
-        echo "export PATH=$PATH:/usr/local/bin/chromedriver" >> $GITHUB_ENV
 
     - name: Cache Maven packages
       uses: actions/cache@v2
