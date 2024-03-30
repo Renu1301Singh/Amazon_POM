@@ -15,8 +15,15 @@ jobs:
       
     - name: Install Chrome
       run: |
-        sudo apt-get update
-        sudo apt-get install -y google-chrome-stable
+         wget https://chromedriver.storage.googleapis.com/LATEST_RELEASE/chromedriver_linux64.zip
+
+         unzip chromedriver_linux64.zip
+
+         sudo mv chromedriver /usr/bin/chromedriver  
+
+         sudo chown root:root /usr/bin/chromedriver
+
+         sudo chmod +x /usr/bin/chromedriver
 
     - name: Install Java
       uses: actions/setup-java@v2
@@ -44,4 +51,4 @@ jobs:
           restore-keys: ${{ runner.os }}-maven-
 
     - name: Build and test
-      run: mvn clean test 
+      run: mvn clean test -Dwebdriver.chrome.driver=/usr/bin/chromedriver
