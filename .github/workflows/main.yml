@@ -1,14 +1,14 @@
-name: Automated Testing
+name: Automated_Testing_Pipeline
 
 on:
   push:
-    branches:
-      - main
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
 
 jobs:
-  selenium-test:
+  selenium_test:
     runs-on: ubuntu-latest
-
     steps:
     - name: Checkout Repository
       uses: actions/checkout@v2
@@ -17,19 +17,19 @@ jobs:
       uses: actions/setup-java@v2
       with:
         java-version: '21'
+        distribution: 'adopt'
 
     - name: Install Maven
       run: sudo apt-get install maven
 
-    - name: Install Chrome WebDriver
+    - name: Set up Chrome WebDriver
       run: |
-        wget https://chromedriver.storage.googleapis.com/LATEST_RELEASE
-        CHROMEDRIVER_VERSION=$(cat LATEST_RELEASE)
-        wget https://chromedriver.storage.googleapis.com/$CHROMEDRIVER_VERSION/chromedriver_linux64.zip
-        unzip chromedriver_linux64.zip
-        sudo mv chromedriver /usr/bin/
-        sudo chown root:root /usr/bin/chromedriver
-        sudo chmod +x /usr/bin/chromedriver
+        LATEST_CHROMEDRIVER_VERSION=$(curl -s https://chromedriver.storage.googleapis.com/LATEST_RELEASE)
+        curl -o chromedriver.zip https://chromedriver.storage.googleapis.com/$LATEST_CHROMEDRIVER_VERSION/chromedriver_linux64.zip
+        unzip chromedriver.zip
+        sudo mv chromedriver /usr/local/bin/
+        sudo chmod +x /usr/local/bin/chromedriver
+        echo "export PATH=$PATH:/usr/local/bin/chromedriver" >> $GITHUB_ENV
 
     - name: Cache Maven packages
       uses: actions/cache@v2
@@ -39,4 +39,4 @@ jobs:
           restore-keys: ${{ runner.os }}-maven-
 
     - name: Build and test
-      run: mvn clean test -Dwebdriver.chrome.driver=/usr/bin/chromedriver
+      run: mvn clean test -Dwebdriver.chrome.driver=/usr/local/bin/chromedriver --verbose
