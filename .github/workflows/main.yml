@@ -1,35 +1,40 @@
-name: Automated_Testing_Pipeline
+name: Install Chrome Browser
 
 on:
   push:
-    branches: [ main ]
-  pull_request:
-    branches: [ main ]
+    branches:
+      - main
 
 jobs:
-  selenium_test:
+  chrome-install:
     runs-on: ubuntu-latest
+
     steps:
     - name: Checkout Repository
       uses: actions/checkout@v2
 
-    - name: Install Java
-      uses: actions/setup-java@v2
-      with:
-        java-version: '21'
-        distribution: 'adopt'
-
-    - name: Install Maven
-      run: sudo apt-get install maven
-
-    - name: Set up Chrome WebDriver
+    - name: Install Chrome Browser
       run: |
-        LATEST_CHROMEDRIVER_VERSION=$(curl -s https://chromedriver.storage.googleapis.com/LATEST_RELEASE)
-        curl -o chromedriver.zip https://chromedriver.storage.googleapis.com/$LATEST_CHROMEDRIVER_VERSION/chromedriver_linux64.zip
-        unzip chromedriver.zip
-        sudo mv chromedriver /usr/local/bin/
-        sudo chmod +x /usr/local/bin/chromedriver
-        echo "export PATH=$PATH:/usr/local/bin/chromedriver" >> $GITHUB_ENV
+        # Update the package list
+        sudo apt-get update
+
+        # Install the prerequisites
+        sudo apt-get install -y gdebi-core
+
+        # Download the Chrome Browser
+        wget https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb
+
+        # Install the Chrome Browser
+        sudo gdebi google-chrome-stable_current_amd64.deb -q
+
+    - name: Verify Chrome Browser Installation
+      run: |
+        # Check if Chrome Browser is installed
+        chrome --version
+
+        # Check if Chrome Browser can be launched
+        google-chrome --no-sandbox
+      
 
     - name: Cache Maven packages
       uses: actions/cache@v2
