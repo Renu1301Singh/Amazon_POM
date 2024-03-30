@@ -7,37 +7,36 @@ on:
     branches: [ main ]
 
 jobs:
- selenium_test:
-  runs-on: ubuntu-latest
-  steps:
+  selenium_test:
+    runs-on: ubuntu-latest
+    steps:
     - name: Checkout Repository
       uses: actions/checkout@v2
 
     - name: Install Java
       uses: actions/setup-java@v2
       with:
-        java-version: '21'  
+        java-version: '21'
         distribution: 'adopt'
 
-      
     - name: Install Maven
       run: sudo apt-get install maven
+
     - name: Set up Chrome WebDriver
       run: |
-          LATEST_CHROMEDRIVER_VERSION=$(curl -s https://chromedriver.storage.googleapis.com/LATEST_RELEASE)
-          curl -o chromedriver.zip https://chromedriver.storage.googleapis.com/$LATEST_CHROMEDRIVER_VERSION/chromedriver_linux64.zip
-          unzip chromedriver.zip
-          sudo mv chromedriver /usr/local/bin/
-          sudo chmod +x /usr/local/bin/chromedriver
-           
+        LATEST_CHROMEDRIVER_VERSION=$(curl -s https://chromedriver.storage.googleapis.com/LATEST_RELEASE)
+        curl -o chromedriver.zip https://chromedriver.storage.googleapis.com/$LATEST_CHROMEDRIVER_VERSION/chromedriver_linux64.zip
+        unzip chromedriver.zip
+        sudo mv chromedriver /usr/local/bin/
+        sudo chmod +x /usr/local/bin/chromedriver
+        echo "export PATH=$PATH:/usr/local/bin/chromedriver" >> $GITHUB_ENV
+
     - name: Cache Maven packages
       uses: actions/cache@v2
       with:
           path: ~/.m2
           key: ${{ runner.os }}-maven-${{ hashFiles('**/pom.xml') }}
           restore-keys: ${{ runner.os }}-maven-
+
     - name: Build and test
-      run: mvn clean test
-   
-      
-      
+      run: mvn clean test -Dwebdriver.chrome.driver=/usr/local/bin/chromedriver --verbose
