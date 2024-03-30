@@ -1,4 +1,4 @@
-name: Install Chrome Browser
+name: Automated Testing
 
 on:
   push:
@@ -6,35 +6,30 @@ on:
       - main
 
 jobs:
-  chrome-install:
+  selenium-test:
     runs-on: ubuntu-latest
 
     steps:
     - name: Checkout Repository
       uses: actions/checkout@v2
 
-    - name: Install Chrome Browser
+    - name: Install Java
+      uses: actions/setup-java@v2
+      with:
+        java-version: '21'
+
+    - name: Install Maven
+      run: sudo apt-get install maven
+
+    - name: Install Chrome WebDriver
       run: |
-        # Update the package list
-        sudo apt-get update
-
-        # Install the prerequisites
-        sudo apt-get install -y gdebi-core
-
-        # Download the Chrome Browser
-        wget https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb
-
-        # Install the Chrome Browser
-        sudo gdebi google-chrome-stable_current_amd64.deb -q
-
-    - name: Verify Chrome Browser Installation
-      run: |
-        # Check if Chrome Browser is installed
-        chrome --version
-
-        # Check if Chrome Browser can be launched
-        google-chrome --no-sandbox
-      
+        wget https://chromedriver.storage.googleapis.com/LATEST_RELEASE
+        CHROMEDRIVER_VERSION=$(cat LATEST_RELEASE)
+        wget https://chromedriver.storage.googleapis.com/$CHROMEDRIVER_VERSION/chromedriver_linux64.zip
+        unzip chromedriver_linux64.zip
+        sudo mv chromedriver /usr/bin/
+        sudo chown root:root /usr/bin/chromedriver
+        sudo chmod +x /usr/bin/chromedriver
 
     - name: Cache Maven packages
       uses: actions/cache@v2
@@ -44,4 +39,4 @@ jobs:
           restore-keys: ${{ runner.os }}-maven-
 
     - name: Build and test
-      run: mvn clean test -Dwebdriver.chrome.driver=/usr/local/bin/chromedriver 
+      run: mvn clean test -Dwebdriver.chrome.driver=/usr/bin/chromedriver
