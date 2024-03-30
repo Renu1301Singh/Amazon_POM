@@ -19,6 +19,7 @@ jobs:
         java-version: '21'  
         distribution: 'adopt'
 
+      
     - name: Install Maven
       run: sudo apt-get install maven
     - name: Set up Chrome WebDriver
@@ -28,8 +29,15 @@ jobs:
           unzip chromedriver.zip
           sudo mv chromedriver /usr/local/bin/
           sudo chmod +x /usr/local/bin/chromedriver
-
-    - name: Run Selenium tests with Maven
-      run: mvn clean test -Dtest=AmazonPageTest
+           
+    - name: Cache Maven packages
+      uses: actions/cache@v2
+      with:
+          path: ~/.m2
+          key: ${{ runner.os }}-maven-${{ hashFiles('**/pom.xml') }}
+          restore-keys: ${{ runner.os }}-maven-
+    - name: Build and test
+      run: mvn clean test
+   
       
       
