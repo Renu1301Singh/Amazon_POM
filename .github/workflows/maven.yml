@@ -22,8 +22,13 @@ jobs:
         distribution: 'temurin'
         cache: maven
 
-    - name: Set up Chrome WebDriver
-      uses: browser-actions/setup-chrome@latest
+    - name: Download Chrome WebDriver
+      run: |
+        wget https://chromedriver.storage.googleapis.com/latest/chromedriver_linux64.zip
+        unzip chromedriver_linux64.zip
+        sudo mv chromedriver /usr/bin/chromedriver
+        sudo chown root:root /usr/bin/chromedriver
+        sudo chmod +x /usr/bin/chromedriver
 
     - name: Check Chrome version
       run: google-chrome --version || (echo "Google Chrome not found, trying to install..." && sudo apt-get update && sudo apt-get install -y google-chrome-stable)
@@ -35,6 +40,17 @@ jobs:
           echo "Google Chrome failed to start, trying to reset..."
           sudo apt-get remove --purge google-chrome-stable
           sudo apt-get install -y google-chrome-stable
+        fi
+        /usr/bin/chromedriver --version &> chromedriver-version.log
+        if ! grep -q "ChromeDriver" chromedriver-version.log; then
+          echo "ChromeDriver failed to start, trying to reset..."
+          sudo rm /usr/bin/chromedriver
+          wget https://chromedriver.storage.googleapis.com/latest/chromedriver_linux64.zip
+          unzip chromedriver_linux64.zip
+          sudo mv chromedriver /usr/bin/chromedriver
+          sudo chown root:root /usr/bin/chromedriver
+          sudo chmod +x /usr/bin/chromedriver
+          sleep 5
         fi
         google-chrome --headless --disable-gpu --remote-debugging-port=9222 --no-sandbox --disable-dev-shm-usage --disable-seccomp-filter-sandbox http://localhost &
         sleep 5
