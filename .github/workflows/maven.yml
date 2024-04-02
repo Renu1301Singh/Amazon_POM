@@ -12,67 +12,37 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-    - name: Checkout code
-      uses: actions/checkout@v3
+    - name: Checkout repository
+      uses: actions/checkout@v2
 
     - name: Set up JDK 11
-      uses: actions/setup-java@v3
+      uses: actions/setup-java@v2
       with:
         java-version: '11'
-        distribution: 'temurin'
-        cache: maven
 
-    - name: Download Chrome WebDriver
+    - name: Install Chrome and ChromeDriver
       run: |
-        wget https://chromedriver.storage.googleapis.com/latest/chromedriver_linux64.zip
-        unzip chromedriver_linux64.zip
-        sudo mv chromedriver /usr/bin/chromedriver
-        sudo chown root:root /usr/bin/chromedriver
-        sudo chmod +x /usr/bin/chromedriver
+        sudo apt-get update
+        sudo apt-get install -y google-chrome-stable
+        LATEST_CHROMEDRIVER_VERSION=$(curl -sS chromedriver.storage.googleapis.com/LATEST_RELEASE)
+        wget -q -O /tmp/chromedriver.zip https://chromedriver.storage.googleapis.com/$LATEST_CHROMEDRIVER_VERSION/chromedriver_linux64.zip
+        unzip /tmp/chromedriver.zip -d /tmp
+        sudo mv /tmp/chromedriver /usr/local/bin/chromedriver
+        sudo chmod +x /usr/local/bin/chromedriver
+        rm /tmp/chromedriver.zip
 
-    - name: Check Chrome version
-      run: google-chrome --version || (echo "Google Chrome not found, trying to install..." && sudo apt-get update && sudo apt-get install -y google-chrome-stable)
-      if: success()
+    - name: Cache Maven packages
+      uses: actions/cache@v2
+      with:
+        path: ~/.m2/repository
+        key: ${{ runner.os }}-maven-${{ hashFiles('pom.xml') }}
+        restore-keys: ${{ runner.os }}-maven-
 
-    - name: Run Chrome in headless mode
-      run: |
-        if ! google-chrome --headless --version &> /dev/null; then
-          echo "Google Chrome failed to start, trying to reset..."
-          sudo apt-get remove --purge google-chrome-stable
-          sudo apt-get install -y google-chrome-stable
-        fi
-        /usr/bin/chromedriver --version &> chromedriver-version.log
-        if ! grep -q "ChromeDriver" chromedriver-version.log; then
-          echo "ChromeDriver failed to start, trying to reset..."
-          sudo rm /usr/bin/chromedriver
-          wget https://chromedriver.storage.googleapis.com/latest/chromedriver_linux64.zip
-          unzip chromedriver_linux64.zip
-          sudo mv chromedriver /usr/bin/chromedriver
-          sudo chown root:root /usr/bin/chromedriver
-          sudo chmod +x /usr/bin/chromedriver
-          sleep 5
-        fi
-        google-chrome --headless --disable-gpu --remote-debugging-port=9222 --no-sandbox --disable-dev-shm-usage --disable-seccomp-filter-sandbox http://localhost &
-        sleep 5
-        google-chrome --version &> chrome-version.log
-        if ! grep -q "Google Chrome" chrome-version.log; then
-          echo "Google Chrome failed to start, trying to reset..."
-          sudo apt-get remove --purge google-chrome-stable
-          sudo apt-get install -y google-chrome-stable
-          sleep 5
-          google-chrome --headless --disable-gpu --remote-debugging-port=9222 --no-sandbox --disable-dev-shm-usage --disable-seccomp-filter-sandbox http://localhost &
-        fi
-      id: chrome-start
+    - name: Build and test
+      run: mvn clean test
 
-    - name: Check Chrome logs
-      run: cat chrome-version.log
-      if: failure()
-
-    - name: Wait for Chrome to start
-      run: sleep 3
-
-    - name: Build with Maven
-      run: mvn -B clean test
-      env:
-        DISPLAY: :99
-        NO_PROXY: 127.0.0.1,localhost
+    - name: Upload test reports
+      uses: actions/upload-artifact@v2
+      with:
+        name: test-reports
+        path: target/surefire-reports
