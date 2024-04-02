@@ -24,10 +24,6 @@ jobs:
       run: mvn -B clean test
 
     # Optional: Uploads the full dependency graph to GitHub to improve the quality of Dependabot alerts this repository can receive
-    - name: artifacts
-      uses: actions/upload-artifacts@v3
-      with: 
-         name: report
-         path: ./reports/*.html
+   
       
       
