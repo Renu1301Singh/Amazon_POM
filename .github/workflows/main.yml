@@ -37,6 +37,13 @@ jobs:
           sudo apt-get install -y google-chrome-stable
         fi
         google-chrome --headless --disable-gpu --remote-debugging-port=9222 http://localhost &
+        sleep 5
+        google-chrome --version &> chrome-version.log
+      id: chrome-start
+
+    - name: Check Chrome logs
+      run: cat chrome-version.log
+      if: failure()
 
     - name: Wait for Chrome to start
       run: sleep 3
