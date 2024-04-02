@@ -28,11 +28,8 @@ jobs:
     - name: Check Chrome version
       run: google-chrome --version
 
-    - name: Start Xvfb
-      uses: robertdebock/xvfb-action@master
-
     - name: Run Chrome in headless mode
-      run: google-chrome --headless --disable-gpu --remote-debugging-port=9222 http://localhost &
+      run: google-chrome --headless --disable-gpu --remote-debugging-port=9222 --no-sandbox http://localhost &
 
     - name: Wait for Chrome to start
       run: sleep 5
