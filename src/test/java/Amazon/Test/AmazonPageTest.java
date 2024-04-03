@@ -12,27 +12,23 @@ import org.testng.annotations.*;
 import java.util.concurrent.TimeUnit;
 
 public class AmazonPageTest {
-    WebDriver driver;
-    String driverPath="/usr/bin/chromedriver";
-    ChromeOptions options = new ChromeOptions();
-options.addArguments("--no-sandbox");
-options.addArguments("--disable-dev-shm-usage");
-options.addArguments("--headless");
-driver = new ChromeDriver(options);
-    AmazonHomePage amazonHomePage;
-    AmazonProductColourPage amazonProductColourPage;
-    AmazonAddToCart amazonAddToCart;
-    AmazonProceedToBuy amazonProceedToBuy;
+     WebDriver driver;
+    String driverPath = "/usr/bin/chromedriver";
+    ChromeOptions options;
 
     @BeforeTest
     public void setUp(){
-        System.setProperty("webdriver.chrome.driver",driverPath);
-        driver=new ChromeDriver();
+        options = new ChromeOptions();
+        options.addArguments("--no-sandbox");
+        options.addArguments("--disable-dev-shm-usage");
+        options.addArguments("--headless");
+        
+        System.setProperty("webdriver.chrome.driver", driverPath);
+        driver = new ChromeDriver(options);
         driver.manage().window().maximize();
         driver.manage().timeouts().implicitlyWait(10, TimeUnit.SECONDS);
         driver.get("https://www.amazon.in/");
-        System.out.println("");
-    }
+        }
     @Test(priority = 0, description = "This Test validates the Amazon page is launched")
     void AmazonLaunch(){
         amazonHomePage=new AmazonHomePage(driver);
