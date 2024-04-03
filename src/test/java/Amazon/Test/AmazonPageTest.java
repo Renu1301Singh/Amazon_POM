@@ -10,11 +10,14 @@ import org.testng.Assert;
 import org.testng.annotations.*;
 
 import java.util.concurrent.TimeUnit;
-
 public class AmazonPageTest {
-     WebDriver driver;
+   WebDriver driver;
     String driverPath = "/usr/bin/chromedriver";
     ChromeOptions options;
+    AmazonHomePage amazonHomePage;
+    AmazonProductColourPage amazonProductColourPage; 
+    AmazonAddToCart amazonAddToCart; 
+    AmazonProceedToBuy amazonProceedToBuy; /
 
     @BeforeTest
     public void setUp(){
