@@ -21,27 +21,20 @@ jobs:
         java-version: '11'
         distribution: 'adopt'
 
-    - name: Install Chrome and ChromeDriver
+ 
+    - name: Install Google Chrome 
+
       run: |
-        sudo apt-get update
-        sudo apt-get install -y google-chrome-stable
-        LATEST_CHROMEDRIVER_VERSION=$(curl -sS chromedriver.storage.googleapis.com/LATEST_RELEASE)
-        wget -q -O /tmp/chromedriver.zip https://chromedriver.storage.googleapis.com/$LATEST_CHROMEDRIVER_VERSION/chromedriver_linux64.zip
-        unzip /tmp/chromedriver.zip -d /tmp
-        sudo mv /tmp/chromedriver /usr/local/bin/chromedriver
-        sudo chmod +x /usr/local/bin/chromedriver
-        rm /tmp/chromedriver.zip
 
-    - name: Cache Maven packages
-      uses: actions/cache@v2
-      with:
-        path: ~/.m2/repository
-        key: ${{ runner.os }}-maven-${{ hashFiles('pom.xml') }}
-        restore-keys: ${{ runner.os }}-maven-
+              chmod +x ./scripts/InstallChrome.sh
 
-    - name: Build and test
-      run: mvn clean test
+                          ./scripts/InstallChrome.sh 
 
+    - name: Build with Maven
+
+      run: mvn -B package --file pom.xml test
+
+ 
     - name: Upload test reports
       uses: actions/upload-artifact@v2
       with:
