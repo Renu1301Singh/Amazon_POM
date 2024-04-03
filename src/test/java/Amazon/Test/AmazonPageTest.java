@@ -14,6 +14,11 @@ import java.util.concurrent.TimeUnit;
 public class AmazonPageTest {
     WebDriver driver;
     String driverPath="/usr/bin/chromedriver";
+    ChromeOptions options = new ChromeOptions();
+options.addArguments("--no-sandbox");
+options.addArguments("--disable-dev-shm-usage");
+options.addArguments("--headless");
+driver = new ChromeDriver(options);
     AmazonHomePage amazonHomePage;
     AmazonProductColourPage amazonProductColourPage;
     AmazonAddToCart amazonAddToCart;
