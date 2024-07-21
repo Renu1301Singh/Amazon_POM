@@ -25,3 +25,10 @@ jobs:
      
     - name: Build with Maven
       run: mvn -B clean test
+
+    - name: Upload Test Reports
+      uses: actions/upload-artifact@v3
+      with:
+         name: Selenium-test-reports
+         if: always()
+         path: Amazon_POM/src/test/java/Amazon
